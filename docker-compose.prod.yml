@@ -1,4 +1,3 @@
-
 networks:
   hs-net:
     driver: bridge
@@ -18,7 +17,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-   
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
@@ -51,11 +50,11 @@ services:
       - hs-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.hs-web.rule=HostRegexp({host:.+})"
+      - "traefik.http.routers.hs-web.rule=HostRegexp(`^.+$`)"
       - "traefik.http.routers.hs-web.entrypoints=websecure"
       - "traefik.http.routers.hs-web.tls.certresolver=myresolver"
       - "traefik.http.services.hs-web.loadbalancer.server.port=8000"
-      - "traefik.http.routers.hs-web-http.rule=HostRegexp({host:.+})"
+      - "traefik.http.routers.hs-web-http.rule=HostRegexp(`^.+$`)"
       - "traefik.http.routers.hs-web-http.entrypoints=web"
       - "traefik.http.routers.hs-web-http.middlewares=https-redirect"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"

@@ -3,14 +3,22 @@ networks:
   hs-net:
     driver: bridge
 
+volumes:
+  static_volume:
+  media_volume:
+  logs_volume:
+  db_data:
+  letsencrypt:
+
 services:
   traefik:
     image: traefik:latest
+    container_name: traefik
     restart: unless-stopped
-    
     ports:
       - "80:80"
       - "443:443"
+   
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
@@ -43,7 +51,8 @@ services:
       - hs-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.hs-web.rule=Host(`businessportal.site`)"
+      # Catch-all router for any domain
+      - "traefik.http.routers.hs-web.rule=HostRegexp(`{host:.+}`)"
       - "traefik.http.routers.hs-web.entrypoints=websecure"
       - "traefik.http.routers.hs-web.tls.certresolver=myresolver"
       - "traefik.http.services.hs-web.loadbalancer.server.port=8000"
@@ -56,9 +65,3 @@ services:
       - db_data:/var/lib/postgresql/data
     networks:
       - hs-net
-
-volumes:
-  static_volume:
-  media_volume:
-  logs_volume:
-  db_data:

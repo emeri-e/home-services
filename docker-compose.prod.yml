@@ -27,12 +27,11 @@ services:
   web:
     build:
       context: .
-      target: prod
-    image: hs-web:latest
+      dockerfile: Dockerfile
     container_name: hs-web
     env_file: .env
     environment:
-      GUNICORN_MODULE: "yourproject.wsgi:application"
+      GUNICORN_MODULE: "config.wsgi:application"
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media

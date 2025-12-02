@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Home Services{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  <header data-reveal="fade-down">
+    <div class="container">
+      <div class="logo">
+        <a href="{% url 'home' %}"><strong>{{ client_name|default:"Home Services Co." }}</strong></a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="{% url 'home' %}#services">Services</a></li>
+          <li><a href="{% url 'home' %}#gallery">Gallery</a></li>
+          <li><a href="{% url 'home' %}#reviews">Reviews</a></li>
+          <li><a href="{% url 'home' %}#about">About</a></li>
+          <li><a href="{% url 'home' %}#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn-primary" href="/booking/">Book</a>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer data-reveal="fade-up">
+    <div class="container footer-grid">
+      <div>
+        <strong>{{ client_name|default:"Home Services Co." }}</strong>
+        <p>Trusted home improvement partner since 2010.</p>
+      </div>
+      <div>
+        <p><strong>Contact</strong></p>
+        <p>(555) 123-4567</p>
+        <p>hello@homeservices.com</p>
+      </div>
+      <div>
+        <p><strong>Follow</strong></p>
+        <p><a href="#">Instagram</a></p>
+        <p><a href="#">Facebook</a></p>
+        <p><a href="#">LinkedIn</a></p>
+      </div>
+      <div>
+        <p><strong>Legal</strong></p>
+        <p><a href="#">Privacy Policy</a></p>
+        <p><a href="#">Terms of Service</a></p>
+        <p>Licenses on file</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      © <span id="year"></span> {{ client_name|default:"Home Services Co." }}. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="{% static 'js/app.js' %}" defer></script>
+  <script>
+    (function(){
+      var y = new Date().getFullYear();
+      var el = document.getElementById('year');
+      if(el) el.textContent = y;
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout · Home Services{% endblock %}
+
+{% block content %}
+  <section class="checkout-hero">
+    <div class="container">
+      <p class="step-indicator">Step 2 of 2</p>
+      <h1>Confirm your booking</h1>
+      <p class="section-lead">Review the package details, pick a preferred time, and secure your slot. You will only be charged after we confirm availability.</p>
+    </div>
+  </section>
+
+  <section class="checkout-section" data-checkout-root>
+    <div class="container checkout-grid">
+      <form class="checkout-form" data-checkout-form>
+        <input type="hidden" name="packageId" data-package-input>
+        <fieldset>
+          <legend>Contact details</legend>
+          <div class="form-grid">
+            <label>
+              Full name
+              <input type="text" name="fullName" placeholder="Alex Rivera" required>
+            </label>
+            <label>
+              Phone number
+              <input type="tel" name="phone" placeholder="(555) 123-4567" required>
+            </label>
+            <label>
+              Email address
+              <input type="email" name="email" placeholder="you@email.com" required>
+            </label>
+            <label>
+              Service address
+              <input type="text" name="address" placeholder="123 Main St, Your City" required>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Scheduling</legend>
+          <div class="form-grid">
+            <label>
+              Preferred date
+              <input type="date" name="serviceDate" required>
+            </label>
+            <label>
+              Preferred arrival window
+              <select name="arrivalWindow" required>
+                <option value="">Select window</option>
+                <option>8am – 10am</option>
+                <option>10am – 12pm</option>
+                <option>12pm – 2pm</option>
+                <option>2pm – 4pm</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Project notes
+            <textarea name="notes" placeholder="Anything else we should know?"></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Add-ons</legend>
+          <div class="addons-list">
+            <label class="addon-item">
+              <input type="checkbox" data-addon-price="40" data-addon-label="Premium materials pickup">
+              <span>
+                <strong>Premium materials pickup</strong>
+                <em>+$40</em>
+              </span>
+            </label>
+            <label class="addon-item">
+              <input type="checkbox" data-addon-price="65" data-addon-label="Same-day rush">
+              <span>
+                <strong>Same-day rush</strong>
+                <em>+$65</em>
+              </span>
+            </label>
+            <label class="addon-item">
+              <input type="checkbox" data-addon-price="25" data-addon-label="Extra cleanup crew">
+              <span>
+                <strong>Extra cleanup crew</strong>
+                <em>+$25</em>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Payment details</legend>
+          <div class="form-grid">
+            <label>
+              Card number
+              <input class="card-input" type="text" name="card" placeholder="4242 4242 4242 4242" inputmode="numeric" disabled>
+            </label>
+            <label>
+              Expiration
+              <input class="card-input" type="text" name="expiry" placeholder="MM/YY" disabled>
+            </label>
+            <label>
+              CVC
+              <input class="card-input" type="text" name="cvc" placeholder="123" disabled>
+            </label>
+            <label>
+              Referral code (optional)
+              <input type="text" name="referral" placeholder="WELCOME10">
+            </label>
+          </div>
+          <div class="payment-disabled-note" aria-hidden="false">This is currently disabled.</div>
+        </fieldset>
+
+        <div class="checkout-actions">
+          <label class="addon-item small">
+            <input type="checkbox" required>
+            <span>I agree to the service terms and cancellation window.</span>
+          </label>
+          <button type="submit" class="btn btn-primary">Confirm & place booking</button>
+          <p class="secure-badge">🔒 Securely processed with 256-bit encryption</p>
+        </div>
+      </form>
+
+      <aside class="checkout-summary" data-package-summary>
+        <div class="summary-card">
+            <div class="summary-header">
+              <span class="badge accent" data-package-badge>Selected package</span>
+              {% if package %}
+                <h2>{{ package.name }}</h2>
+                <p>{{ package.description }}</p>
+                <p class="muted">Duration: {{ package.duration_hours }} hour{% if package.duration_hours > 1 %}s{% endif %}</p>
+              {% else %}
+                <h2 data-package-name>Loading…</h2>
+                <p data-package-description></p>
+                <p class="muted" data-package-duration></p>
+              {% endif %}
+            </div>
+              <div id="page-data" style="display:none"
+                data-package-name="{% if package %}{{ package.name|escapejs }}{% endif %}"
+                data-whatsapp-phone="{% if general and general.phone %}{{ general.phone|escapejs }}{% endif %}">
+              </div>
+            <ul class="package-list" data-package-features>
+              {% if package and package.features %}
+                {% for f in package.features %}
+                <li>{{ f }}</li>
+                {% endfor %}
+              {% endif %}
+            </ul>
+            <div class="summary-line">
+              <span>Package rate</span>
+              <strong data-package-price>{% if package %}${{ package.price }}{% else %}$0{% endif %}</strong>
+            </div>
+            <div class="summary-line summary-line-muted">
+              <span>Add-ons</span>
+              <div data-addons-summary>No add-ons selected</div>
+            </div>
+            <div class="summary-total">
+              <span>Total due today</span>
+              <strong data-package-total>{% if package %}${{ package.price }}{% else %}$0{% endif %}</strong>
+            </div>
+            <p class="muted small">We pre-authorize your card and finalize once the crew confirms availability.</p>
+          </div>
+      </aside>
+    </div>
+  </section>
+{% block scripts %}
+<script>
+// Intercept checkout form submission and forward details to WhatsApp
+(function(){
+  const form = document.querySelector('[data-checkout-form]');
+  if(!form) return;
+
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+
+    // collect form values
+    const fd = new FormData(form);
+    const values = {};
+    for(const [k,v] of fd.entries()){
+      // For multiple same-name fields (none here) you'd need special handling
+      values[k] = v;
+    }
+
+    // collect addons (checked)
+    const addons = [];
+    document.querySelectorAll('.addon-item input[type="checkbox"]').forEach(cb => {
+      if(cb.checked){
+        const label = cb.closest('.addon-item').querySelector('strong');
+        const txt = label ? label.textContent.trim() : cb.getAttribute('data-addon-label') || 'Addon';
+        addons.push(txt);
+      }
+    });
+
+    // package info from the hidden data element (safer for static analysis)
+    const dataEl = document.getElementById('page-data');
+    const TEMPLATE_PACKAGE_NAME = dataEl ? (dataEl.dataset.packageName || null) : null;
+    const pkgName = (window.PAGE_PACKAGE_NAME || (document.querySelector('[data-package-badge]') && document.querySelector('[data-package-badge]').textContent.trim()) ) || TEMPLATE_PACKAGE_NAME;
+
+    // build message
+    const lines = [];
+    lines.push('New booking request');
+    if(pkgName) lines.push('Package: ' + pkgName);
+    if(values.fullName) lines.push('Name: ' + values.fullName);
+    if(values.phone) lines.push('Phone: ' + values.phone);
+    if(values.email) lines.push('Email: ' + values.email);
+    if(values.address) lines.push('Address: ' + values.address);
+    if(values.serviceDate) lines.push('Preferred date: ' + values.serviceDate);
+    if(values.arrivalWindow) lines.push('Arrival window: ' + values.arrivalWindow);
+    if(values.notes) lines.push('Notes: ' + values.notes);
+    if(addons.length) lines.push('Add-ons: ' + addons.join(', '));
+    if(values.referral) lines.push('Referral: ' + values.referral);
+
+    const message = encodeURIComponent(lines.join('\n'));
+
+    // try to send to configured phone if available (from data element)
+    let phone = null;
+    if(dataEl && dataEl.dataset.whatsappPhone){
+      phone = dataEl.dataset.whatsappPhone.replace(/\D/g, '');
+    }
+
+    let url;
+    if(phone){
+      url = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + message;
+    } else {
+      // fallback: open WhatsApp message composer (recipient to be chosen by user)
+      url = 'https://api.whatsapp.com/send?text=' + message;
+    }
+
+    window.open(url, '_blank');
+  });
+})();
+</script>
+{% endblock %}
+{% endblock %}
+

@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Home Services{% endblock %}
+
+{% block content %}
+  <section class="hero" id="hero">
+    <div class="container hero-grid">
+      <div data-reveal="slide-up">
+        <div class="eyebrow">{{ general.tagline|default:'Your local pros' }}</div>
+        <h1>{{ general.hero_title|default:'Reliable Home Services On Your Schedule' }}</h1>
+        <p>{{ general.hero_subtitle|default:'Full-service home repairs, maintenance, and upgrades handled by licensed professionals with upfront pricing and friendly support.' }}</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="/booking/">Book</a>
+          <button class="btn btn-outline">Get a Quote</button>
+          <button class="btn btn-outline">Call</button>
+        </div>
+      </div>
+      <div class="hero-card" data-reveal="slide-left" style="--reveal-delay: .1s;">
+        <p><strong>{{ general.site_name|default:'24/7 Support' }}</strong></p>
+        <p>{{ general.footer_text|default:'We pick up the phone and arrive on time. Guaranteed.' }}</p>
+        <ul>
+          <li>✔ Licensed & insured</li>
+          <li>✔ Same-week scheduling</li>
+          <li>✔ 100% satisfaction</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container trust-strip">
+      <div class="trust-item" data-reveal="zoom-in">
+        <strong>4.9★</strong>
+        <p>Average rating across 1.2k+ reviews</p>
+      </div>
+      <div class="trust-item" data-reveal="zoom-in" style="--reveal-delay: .1s;">
+        <strong>15+</strong>
+        <p>Years serving local homeowners</p>
+      </div>
+      <div class="trust-item" data-reveal="zoom-in" style="--reveal-delay: .2s;">
+        <strong>Licensed</strong>
+        <p>General contractor • Plumbing • Electrical</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="container">
+      <div class="eyebrow">What we do</div>
+      <h2 class="section-heading">Services that cover every room</h2>
+      <p class="section-lead">Use this section to highlight top offerings. Each card can link to a dedicated service detail page.</p>
+      <div class="card-grid">
+        {% for svc in services %}
+        <article class="card" data-reveal="fade-up" style="--reveal-delay: 0.{{ forloop.counter0 }}s;">
+          <h3>{{ svc.name }}</h3>
+          <p>{{ svc.description }}</p>
+        </article>
+        {% empty %}
+        <article class="card" data-reveal="fade-up">
+          <h3>Plumbing</h3>
+          <p>Repairs, fixture upgrades, repiping, water heaters, and emergency calls.</p>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="container">
+      <div class="eyebrow">Recent work</div>
+      <h2 class="section-heading">Project gallery</h2>
+      <p class="section-lead">Swap these placeholders with your own project shots.</p>
+      <div class="gallery-grid">
+        {% for img in gallery %}
+        <figure data-reveal="zoom-in" style="--reveal-delay: 0.{{ forloop.counter0 }}s;">
+          {% if img.image and img.image.url %}
+            <img src="{{ img.image.url }}" alt="{{ img.caption|default:img.title }}">
+          {% else %}
+            <img src="{{ img.image_url }}" alt="{{ img.caption|default:img.title }}">
+          {% endif %}
+          <figcaption>{{ img.caption|default:img.title }}</figcaption>
+        </figure>
+        {% empty %}
+        <figure data-reveal="zoom-in">
+          <img src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80" alt="Modern bathroom remodel">
+          <figcaption>Bathroom Remodel</figcaption>
+        </figure>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="reviews">
+    <div class="container">
+      <div class="eyebrow">Happy clients</div>
+      <h2 class="section-heading">Reviews & testimonials</h2>
+      <div class="reviews">
+        {% for t in testimonials %}
+        <article class="review-card" data-reveal="slide-up" style="--reveal-delay: 0.{{ forloop.counter0 }}s;">
+          <p>"{{ t.text }}"</p>
+          <footer>— {{ t.author }}</footer>
+        </article>
+        {% empty %}
+        <article class="review-card" data-reveal="slide-up">
+          <p>"Incredible service from start to finish. They handled our kitchen remodel flawlessly and stayed on budget."</p>
+          <footer>— Maria L.</footer>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="eyebrow">Book now</div>
+      <h2 class="section-heading">Fast scheduling & free estimates</h2>
+      <div class="contact-grid">
+        <form data-reveal="fade-up">
+          <input type="text" name="name" placeholder="Full name">
+          <input type="tel" name="phone" placeholder="Phone number">
+          <input type="email" name="email" placeholder="Email address" value="{{ general.email }}">
+          <select name="service">
+            <option value="">Select service</option>
+            {% for svc in services %}
+            <option>{{ svc.name }}</option>
+            {% empty %}
+            <option>Plumbing</option>
+            <option>Electrical</option>
+            <option>Remodeling</option>
+            <option>Maintenance</option>
+            {% endfor %}
+          </select>
+          <textarea name="details" placeholder="Project details"></textarea>
+          <button type="submit" class="btn btn-primary">Submit request</button>
+        </form>
+        <div data-reveal="slide-left" style="--reveal-delay: .1s;">
+          <h3>Need an instant reply?</h3>
+          <p>Chat with our dispatcher on WhatsApp for fast answers and real-time scheduling.</p>
+          <a class="whatsapp" href="https://wa.me/{{ general.phone|default:'1234567890' }}" target="_blank" rel="noreferrer">WhatsApp Us</a>
+          <ul class="contact-list">
+            <li>📞 {{ general.phone|default:'(555) 123-4567' }}</li>
+            <li>✉ {{ general.email|default:'hello@homeservices.com' }}</li>
+            <li>📍 {{ general.address|default:'123 Main St, Your City' }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="container">
+      <div class="eyebrow">About us</div>
+      <h2 class="section-heading">Meet the team behind the work</h2>
+      <p class="section-lead">Introduce founders, crew leads, and certifications.</p>
+      <div class="team-grid">
+        {% for member in team %}
+        <article class="team-card" data-reveal="fade-up" style="--reveal-delay: 0.{{ forloop.counter0 }}s;">
+          {% if member.photo and member.photo.url %}
+            <img src="{{ member.photo.url }}" alt="{{ member.name }}">
+          {% else %}
+            <img src="{{ member.photo_url }}" alt="{{ member.name }}">
+          {% endif %}
+          <h3>{{ member.name }}</h3>
+          <p>{{ member.role }}</p>
+        </article>
+        {% empty %}
+        <article class="team-card" data-reveal="fade-up">
+          <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80" alt="Team member">
+          <h3>Alex Rivera</h3>
+          <p>Founder · GC License #12345</p>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="eyebrow">FAQ & pricing</div>
+      <div class="card-grid">
+        <div data-reveal="slide-up">
+          <h2 class="section-heading">Questions answered</h2>
+          {% for f in faqs %}
+          <div class="faq-item">
+            <details>
+              <summary>{{ f.question }}</summary>
+              <p>{{ f.answer }}</p>
+            </details>
+          </div>
+          {% empty %}
+          <div class="faq-item">
+            <details>
+              <summary>Do you offer same-day appointments?</summary>
+              <p>Yes, call before noon for availability. Emergency calls are prioritized.</p>
+            </details>
+          </div>
+          {% endfor %}
+
+        </div>
+        <div class="price-card" data-reveal="slide-left" style="--reveal-delay: .1s;">
+          <h3>Popular packages</h3>
+          <p><strong>$199</strong> Seasonal tune-up</p>
+          <p><strong>$89</strong> Hourly handyman</p>
+          <p><strong>$499+</strong> Project design consult</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="service-area">
+    <div class="container">
+      <div class="eyebrow">Coverage</div>
+      <h2 class="section-heading">Service area</h2>
+      <p class="section-lead">Embed a custom Google Map highlighting your coverage. Swap the src attribute below with your map embed.</p>
+      <iframe class="map" data-reveal="fade-up" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509415!2d144.95373531584703!3d-37.81720997975171!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65d43f2f1b1f5%3A0x5045675218ce0e33!2sMelbourne%20VIC!5e0!3m2!1sen!2sau!4v1600000000000!5m2!1sen!2sau" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Service area map"></iframe>
+    </div>
+  </section>
+{% endblock %}
+

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Book a Service · Home Services{% endblock %}
+
+{% block content %}
+  <section class="hero booking-hero">
+    <div class="container">
+      <p class="step-indicator">Step 1 of 2</p>
+      <h1>Choose the package that fits your project</h1>
+      <p class="section-lead">Select from our curated service bundles. Each package includes materials planning, licensed technicians, and a post-job walkthrough.</p>
+      <div class="booking-meta">
+        <span class="pill">Avg. response under 1 hour</span>
+        <span class="pill">Licensed & insured pros</span>
+        <span class="pill">Secure checkout</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="package-section">
+    <div class="container">
+      <div class="package-grid">
+        {% if packages %}
+          {% for pkg in packages %}
+          <article class="package-card {% if forloop.first %}package-card-highlight{% endif %}">
+            <div class="package-header">
+              <span class="badge neutral">{% if pkg.billing == 'monthly' %}Subscription{% else %}Package{% endif %}</span>
+              <h3>{{ pkg.name }}</h3>
+              <p>{{ pkg.description }}</p>
+            </div>
+            <div class="package-price">
+              <strong>${{ pkg.price }}</strong>
+              <span>{{ pkg.duration_hours }} hour{% if pkg.duration_hours > 1 %}s{% endif %}</span>
+            </div>
+            <ul class="package-list">
+              {% if pkg.features %}
+                {% for f in pkg.features %}
+                <li>{{ f }}</li>
+                {% endfor %}
+              {% else %}
+                <li>Details available on selection</li>
+              {% endif %}
+            </ul>
+            <a class="btn btn-primary package-cta" href="/checkout/?package={{ pkg.slug }}">Select package</a>
+          </article>
+          {% endfor %}
+        {% else %}
+          <!-- fallback static packages -->
+          <article class="package-card">
+            <div class="package-header">
+              <span class="badge neutral">Quick fix</span>
+              <h3>Essential Handyman</h3>
+              <p>Perfect for punch lists and light repairs you need handled fast.</p>
+            </div>
+            <div class="package-price">
+              <strong>$189</strong>
+              <span>Up to 2 hours on-site</span>
+            </div>
+            <ul class="package-list">
+              <li>Minor plumbing & electrical fixes</li>
+              <li>Fixture swaps & touch-ups</li>
+              <li>Includes trip + materials run</li>
+            </ul>
+            <a class="btn btn-primary package-cta" href="/checkout/?package=essential">Select package</a>
+          </article>
+        {% endif %}
+      </div>
+
+      <div class="package-footnote">
+        <p>Need something custom? <a href="{% url 'home' %}#contact">Send project details</a> or call (555) 123-4567 and we will craft a tailored estimate.</p>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+

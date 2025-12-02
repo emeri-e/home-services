@@ -1,0 +1,65 @@
+version: "3.9"
+
+networks:
+  hs-net:
+    driver: bridge
+
+services:
+  traefik:
+    image: traefik:v2.10
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=daniel4buz@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    networks:
+      - hs-net
+
+  web:
+    build:
+      context: .
+      target: prod
+    image: hs-web:latest
+    container_name: hs-web
+    env_file: .env
+    environment:
+      GUNICORN_MODULE: "yourproject.wsgi:application"
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - logs_volume:/app/logs
+    depends_on:
+      - db
+    networks:
+      - hs-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hs-web.rule=Host(`businessportal.site`)"
+      - "traefik.http.routers.hs-web.entrypoints=websecure"
+      - "traefik.http.routers.hs-web.tls.certresolver=myresolver"
+      - "traefik.http.services.hs-web.loadbalancer.server.port=8000"
+
+  db:
+    image: postgres:16
+    container_name: hs-db
+    env_file: .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - hs-net
+
+volumes:
+  static_volume:
+  media_volume:
+  logs_volume:
+  db_data:

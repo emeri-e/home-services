@@ -21,6 +21,12 @@ python manage.py migrate --noinput
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
-# Run server
-echo "Starting Django development server on 0.0.0.0:8000..."
-python manage.py runserver 0.0.0.0:8000
+# Start the app
+if [ -n "${GUNICORN_MODULE:-}" ]; then
+  # Start gunicorn with sensible defaults; workers can be tuned
+  echo "Starting Gunicorn ($GUNICORN_MODULE) on 0.0.0.0:8000"
+  exec gunicorn --bind 0.0.0.0:8000 --workers 3 "$GUNICORN_MODULE"
+else
+  echo "GUNICORN_MODULE not set — starting Django development server"
+  exec python manage.py runserver 0.0.0.0:8000
+fi
